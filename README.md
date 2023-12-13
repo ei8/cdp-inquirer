@@ -1,1 +1,1 @@
-# cortex-diary-plugins-tree
+# cortex-diary-plugins-inquirer

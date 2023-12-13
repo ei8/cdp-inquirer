@@ -1,0 +1,50 @@
+﻿@using Blazorise
+@using Blazorise.DataGrid
+@using Microsoft.AspNetCore.Components.Web
+@using ei8.Cortex.Diary.Application.Access
+@using ei8.Cortex.Diary.Plugins.Inquirer.ViewModels
+@using ei8.Cortex.Library.Client
+
+<DataGrid TItem="NeuronResultViewModel"
+        Data="@this.Neurons"
+        @bind-SelectedRow="@this.selectedNeuron"
+        ShowPager
+        CommandMode="DataGridCommandMode.ButtonRow"
+        Responsive>
+    <DataGridColumns>
+        <DataGridCommandColumn />
+        <DataGridColumn Field="@nameof(NeuronResultViewModel.Tag)" Caption="Results" Sortable="false" />
+        <DataGridColumn Field="@nameof(NeuronResultViewModel.StatusMessage)" Caption="Status Message" Sortable="false" />
+    </DataGridColumns>
+    <ButtonRowTemplate>
+        <Button Color="Color.Warning" Disabled="(this.selectedNeuron is null || !this.selectedNeuron.Neuron.Validation.RestrictionReasons.Any())" Clicked="this.RequestClicked">Request Access</Button>
+    </ButtonRowTemplate>
+</DataGrid>
+    
+@code {
+
+    [Parameter]
+    public List<NeuronResultViewModel> Neurons { get; set; }
+
+    [Parameter]
+    public IAccessApplicationService AccessApplicationService { get; set; }
+
+    private NeuronResultViewModel selectedNeuron;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        this.selectedNeuron = null;
+        return base.OnParametersSetAsync();
+    }
+
+    private void RequestClicked(MouseEventArgs mea)
+    {
+        if (QueryUrl.TryParse(this.selectedNeuron.Neuron.Url, out QueryUrl qu))
+            this.AccessApplicationService.RequestNeuronAccessAsync(qu.AvatarUrl, qu.Id);
+    }
+}

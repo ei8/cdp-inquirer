@@ -1,0 +1,83 @@
+﻿@using Blazorise.DataGrid
+@using Blazorise
+@using Microsoft.AspNetCore.Components.Web
+@using ei8.Cortex.Diary.Application.Access
+@using ei8.Cortex.Diary.Application.Neurons
+@using ei8.Cortex.Diary.Plugins.Inquirer.ViewModels
+
+<DataGrid TItem="QueryViewModel"
+        Data="@this.Queries"
+        @bind-SelectedRow="@this.selectedQuery"
+        NewItemCreator="this.CreateNewItem"
+        Editable
+        ShowPager
+        CommandMode="DataGridCommandMode.ButtonRow"
+        Responsive>
+    <DataGridColumns>
+        <DataGridColumn Field="@nameof(QueryViewModel.Filters)" Caption="Queries" Sortable="false">
+            <DisplayTemplate>
+                @this.GetHeader(context)
+            </DisplayTemplate>
+        </DataGridColumn>
+    </DataGridColumns>
+    <DetailRowTemplate>
+        @{
+            var query = context as QueryViewModel;
+
+            <FiltersGrid Filters="query.Filters" NeuronQueryService="this.NeuronQueryService" FilterCaption="Filters" />
+            <NeuronsGrid Neurons="query.Results" AccessApplicationService="this.AccessApplicationService" />
+        }
+    </DetailRowTemplate>
+    <ButtonRowTemplate>
+        <Button Color="Color.Success" Clicked="this.OnNewClicked">New</Button>
+        <Button Color="Color.Primary" Disabled="(this.selectedQuery is null)" Clicked="context.EditCommand.Clicked">Edit</Button>
+        <Button Color="Color.Danger" Disabled="(this.selectedQuery is null)" Clicked="context.DeleteCommand.Clicked">Delete</Button>
+        <Button Color="Color.Link" Clicked="context.ClearFilterCommand.Clicked">Clear Filter</Button>
+    </ButtonRowTemplate>
+</DataGrid>
+
+@code {
+    [Parameter]
+    public List<QueryViewModel> Queries { get; set;  }
+
+    [Parameter]
+    public INeuronQueryService NeuronQueryService { get; set; }
+
+    private QueryViewModel selectedQuery;
+
+    [Parameter]
+    public IAccessApplicationService AccessApplicationService { get; set; }
+
+    private string GetHeader(QueryViewModel query)
+    {
+        string result = string.Empty;
+
+        if (query.Filters.Any())
+            result = string.Join(
+                ", ",
+                query.Filters.Select(f => f.Tag)
+            ) +
+            ": " +
+            query.Results.FirstOrDefault()?.Neuron.Tag +
+            (query.Results.Count > 1 ? "..." : string.Empty);
+        else
+            result = "[Empty Query]";
+
+        return result;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private QueryViewModel CreateNewItem()
+    {
+        return new QueryViewModel(this.NeuronQueryService);
+    }
+
+    private void OnNewClicked(MouseEventArgs e)
+    {
+        this.Queries.Add(this.CreateNewItem());
+    }
+}

@@ -1,0 +1,63 @@
+﻿@using Blazorise.DataGrid
+@using Blazorise
+@using Microsoft.AspNetCore.Components.Web
+@using ei8.Cortex.Diary.Application.Neurons
+@using ei8.Cortex.Diary.Plugins.Inquirer.ViewModels
+
+<DataGrid TItem="ExternalReferenceViewModel"
+        Data="@this.Filters"
+        @bind-SelectedRow="@this.selectedFilter"
+        EditMode="DataGridEditMode.Form"
+        NewItemCreator="this.CreateNewItem"
+        Editable
+        ShowPager
+        CommandMode="DataGridCommandMode.ButtonRow"
+        Responsive>
+    <DataGridColumns>
+        <DataGridCommandColumn  NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false"  >
+                <SaveCommandTemplate>
+                    <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary" Clicked="@context.Clicked">@context.LocalizationString</Button>
+                </SaveCommandTemplate>
+                <CancelCommandTemplate>
+                    <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked">@context.LocalizationString</Button>
+                </CancelCommandTemplate>
+            </DataGridCommandColumn>
+        <DataGridColumn Field="@nameof(ExternalReferenceViewModel.Url)" Caption="@this.FilterCaption" Sortable="false" Editable />
+        <DataGridColumn Field="@nameof(ExternalReferenceViewModel.Tag)" Caption="Tag" Sortable="false" />
+    </DataGridColumns>
+    <EmptyTemplate>
+        <div class="box">
+            No filters found. Click 'New' to create a new filter.
+        </div>
+    </EmptyTemplate>
+    <ButtonRowTemplate>
+        <Button Color="Color.Success" Clicked="context.NewCommand.Clicked">New</Button>
+        <Button Color="Color.Primary" Disabled="(this.selectedFilter is null)" Clicked="context.EditCommand.Clicked">Edit</Button>
+        <Button Color="Color.Danger" Disabled="(this.selectedFilter is null)" Clicked="context.DeleteCommand.Clicked">Delete</Button>
+        <Button Color="Color.Link" Clicked="context.ClearFilterCommand.Clicked">Clear Filter</Button>
+    </ButtonRowTemplate>
+</DataGrid>
+    
+@code {
+
+    [Parameter]
+    public List<ExternalReferenceViewModel> Filters { get; set; }
+
+    [Parameter]
+    public INeuronQueryService NeuronQueryService { get; set; }
+
+    [Parameter]
+    public string FilterCaption { get; set; }
+
+    private ExternalReferenceViewModel selectedFilter;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private ExternalReferenceViewModel CreateNewItem()
+    {
+        return new ExternalReferenceViewModel(this.NeuronQueryService);
+    }
+}

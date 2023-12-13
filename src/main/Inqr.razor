@@ -2,6 +2,7 @@
 @using Blazorise
 @using ei8.Cortex.Diary.Application.Subscriptions
 @using ei8.Cortex.Diary.Domain.Model
+@using ei8.Cortex.Diary.Plugins.Inquirer.ViewModels
 @using ei8.Cortex.Diary.Port.Adapter.UI.Views.Blazor.Common
 @using ei8.Cortex.Diary.Application.Neurons
 @using ei8.Cortex.Library.Client
@@ -19,34 +20,34 @@
 @using neurUL.Common.Http
 @using System.Linq
 
-<NeuronContextMenu @bind-SelectedOption="@this.SelectedOption" @bind-IsVisible="@this.IsContextMenuVisible" />
+@* DEL: <NeuronContextMenu @bind-SelectedOption="@this.SelectedOption" @bind-IsVisible="@this.IsContextMenuVisible" />
 <ConfirmationBox Title="Confirm Delete" Message='@this.ProcessSelectionTag("Are you sure you want to delete Neuron '{0}'?")' @bind-IsVisible="@this.IsConfirmVisible" OnConfirmCallback="@this.ConfirmDelete" />
 <NeuronInfoBox @bind-SelectedNeuron="@this.SelectedNeuron" @bind-IsVisible="@this.IsInfoVisible" />
 <AvatarUrlEditorBox @bind-NewAvatarUrl="@this.AvatarUrl" AvatarUrl="@this.AvatarUrl" @bind-IsVisible="@this.IsAvatarUrlVisible" />
 <NeuronSearchBox AvatarUrl="@this.AvatarUrl" @bind-IsVisible="@this.IsSearchDefaultRegionNeuronVisible" @bind-SelectedNeuron="this.SelectedDefaultRegionNeuron" />
-
+*@
 <div class="top-row px-4" style="padding-top:12px;z-index:1">
     <div class="details align-middle ">
         <button class="btn btn-light btn-sm rounded-circle" @onclick="@this.Reload" style="height:32px;width:32px;" title="Reload">
             <Blazorise.Icon Name="FontAwesomeIcons.Redo" />
-            @if (this.NewItemsCount > 0)
+@* DEL:           @if (this.NewItemsCount > 0)
             {
                 <Badge Pill="true" Color="Color.Danger" style="top:-35px;left:8px;height:14px;font-size:0.6em">@(this.NewItemsCount)</Badge>
-            }
+            }*@
         </button>
         <div class="col p-0">
-            <input class="form-control form-control-sm ml-1 rounded inputEditor" id="AvatarUrl" placeholder="Avatar URL" @bind="AvatarUrl" @onkeyup="@this.OnKeyPress" />
-            <button class="inputEditorButton" @onclick="this.ShowAvatarEditorBox"><i class="fas fa-edit"></i></button>
+            <input class="form-control form-control-sm ml-1 rounded inputEditor" id="AvatarUrl" placeholder="Avatar URL" @bind="this.inquiry.AvatarUrl" @onkeyup="@this.OnKeyPress" />
+            @* DEL: <button class="inputEditorButton" @onclick="this.ShowAvatarEditorBox"><i class="fas fa-edit"></i></button>*@
         </div>
-        <button class="btn btn-light btn-sm rounded-circle ml-1" @onclick="this.LoadGraph" style="height:32px; width:32px" title="Load Graph">
+        @* DEL: <button class="btn btn-light btn-sm rounded-circle ml-1" @onclick="this.LoadGraph" style="height:32px; width:32px" title="Load Graph">
             <Blazorise.Icon Name="FontAwesomeIcons.CodeBranch" />
-        </button>
+        </button>*@
         <Dropdown RightAligned="true" @ref="this.optionsDropdown">
             <button class="btn btn-light btn-sm ml-1 rounded-circle" @onclick="this.ShowOptionsMenu" title="Options">
                 <Blazorise.Icon Name="FontAwesomeIcons.EllipsisV" Class="px-1" />
             </button>
             <Blazorise.DropdownMenu style="width: 250px">
-                <DropdownItem @onclick="this.CopyAvatarUrl">
+                @* DEL: <DropdownItem @onclick="this.CopyAvatarUrl">
                     <Blazorise.Icon Name="FontAwesomeIcons.Clone" Class="px-2" />
                     Copy Direct Avatar URL
                 </DropdownItem>
@@ -80,12 +81,16 @@
                 <DropdownItem @onclick="this.SearchDefaultRegionNeuron">
                     <Blazorise.Icon Name="FontAwesomeIcons.SearchPlus" Class="px-2" />
                     Set Default Region ID
-                </DropdownItem>
+                </DropdownItem>*@
             </Blazorise.DropdownMenu>
         </Dropdown>
     </div>
 </div>
-
+<div class="content px-0">
+    <FiltersGrid Filters="this.inquiry.Filters" NeuronQueryService="this.NeuronQueryService" FilterCaption="Common Filters" />
+    <QueriesGrid Queries="this.inquiry.Queries" AccessApplicationService="this.AccessApplicationService" NeuronQueryService="this.NeuronQueryService" />
+</div>
+@* DEL:
 @if (this.reloading)
 {
     <div class="d-flex justify-content-center vh-100" style="padding-top: 300px">
@@ -123,4 +128,4 @@ else
     <EditorBox AvatarUrl="@this.AvatarUrl" InitialRegionNeuron="@this.InitialRegionNeuron" InitialPostsynapticNeurons="@this.InitialPostsynapticNeurons" SelectedNeuron="@this.EditNeuron" @bind-SelectedOption="@this.SelectedOption" />
 </div>
 
-<audio id="sound" src=@(this.SettingsService.BasePath + "/media/alert.wav") />
+<audio id="sound" src=@(this.SettingsService.BasePath + "/media/alert.wav") />*@

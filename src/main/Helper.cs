@@ -9,7 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ei8.Cortex.Diary.Plugins.Tree
+namespace ei8.Cortex.Diary.Plugins.Inquirer
 {
     internal static class Helper
     {

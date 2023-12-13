@@ -1,0 +1,60 @@
+﻿@using Blazorise
+@using ei8.Cortex.Diary.Application.Access
+@using ei8.Cortex.Diary.Plugins.Inquirer.ViewModels
+
+<Accordion>
+    @if (this.queries.Count > 0)
+    {
+        @for (int i = 0; i < this.Queries.Count; i++)
+        {
+            var forI = i;
+            <Collapse Visible="@this.visibleValues[forI]">
+                <CollapseHeader>
+                    <Heading Size="HeadingSize.Is3">
+                        <Button Clicked="@(()=>this.visibleValues[forI]= !this.visibleValues[forI])">
+                            @(this.GetHeader(forI))
+                        </Button>
+                    </Heading>
+                </CollapseHeader>
+                <CollapseBody>
+                    <FiltersGrid Filters="this.queries[forI].Filters" />
+                    <NeuronsGrid Neurons="this.queries[forI].Results" AccessApplicationService="this.AccessApplicationService" />
+                </CollapseBody>
+            </Collapse>
+        }
+    }
+</Accordion>
+@code {
+    private bool[] visibleValues;
+
+    private List<QueryViewModel> queries;
+    [Parameter]
+    public List<QueryViewModel> Queries
+    {
+        get => this.queries;
+        set 
+        {
+            this.queries = value;
+            this.visibleValues = Enumerable.Repeat(true, this.queries.Count).ToArray();
+        }
+    }
+
+    [Parameter]
+    public IAccessApplicationService AccessApplicationService { get; set; }
+
+    private string GetHeader(int index)
+    {
+        var result = string.Empty;
+        if (index < this.Queries.Count)
+        {
+            var currentQuery = this.queries[index];
+            result = string.Join(
+                ", ", 
+                currentQuery.Filters.Select(f => f.Tag)) + 
+                ": " + 
+                currentQuery.Results.FirstOrDefault()?.Neuron.Tag + 
+                (currentQuery.Results.Count > 1 ? "..." : string.Empty);
+        }
+        return result;
+    }
+}
